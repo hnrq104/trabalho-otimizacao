@@ -1,0 +1,106 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfig}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\title{Relatório de Trabalho de Otimização: Digital Image Correlation and Tracking}
+\author{
+    Rafael Campos\\
+    \and 
+    Henrique Cardoso\\
+    \and 
+    Lucas Carelli\\
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introdução}
+
+O presente trabalho tem como objetivo explorar aplicações práticas de algoritmos de otimização, com foco em problemas relacionados à análise e correlação de imagens digitais. Durante a pesquisa inicial, encontramos um vídeo que detalhava como mouses ópticos utilizam algoritmos de otimização não linear, como o \textit{gradient descent}, para determinar o deslocamento de imagens sucessivas capturadas pelo sensor.
+
+Essa aplicação despertou nosso interesse, levando-nos a investigar mais profundamente as técnicas subjacentes a esse processo. Identificamos dois métodos principais para encontrar o deslocamento entre imagens: um baseado em transformadas rápidas de Fourier (FFT) e correlação cruzada, amplamente utilizado em dispositivos como mouses ópticos, e outro baseado em otimização não linear usando \textit{gradient descent} para maximizar a correlação.
+
+\section{Implementação}
+
+Para a implementação e os testes dos algoritmos, utilizamos as bibliotecas \texttt{OpenCV} e \texttt{SciPy} na linguagem Python. A \texttt{OpenCV} foi empregada para manipulação e pré-processamento das imagens, enquanto a \texttt{SciPy} foi utilizada para o cálculo das correlações cruzadas necessárias nos métodos.
+
+As implementações podem ser vistas em \url{https://gitlab.com/rafaelgc/trabalho-otimizacao.git}
+
+\subsection{Método baseado em FFT e correlação cruzada}
+
+No método baseado em FFT, a implementação seguiu o procedimento padrão de correlação cruzada no domínio da frequência. Inicialmente, as imagens são transformadas utilizando a Transformada Rápida de Fourier (FFT), e o produto ponto das transformadas conjugadas é calculado. Em seguida, aplicamos a transformada inversa para obter a matriz de correlação no domínio espacial. A posição do pico máximo dessa matriz determina o deslocamento entre as imagens.
+
+\subsection{Método baseado em otimização não linear (PNL)}
+
+Para o algoritmo de otimização não linear, formulamos o problema como uma maximização da correlação entre as imagens deslocadas. Embora seja possível abordar o problema minimizando a diferença quadrática entre as imagens deslocadas, optamos por implementar a maximização da correlação, conforme recomendado pela literatura especializada.
+
+O algoritmo utiliza a função de correlação normalizada como função objetivo, a qual é avaliada iterativamente enquanto os deslocamentos nos eixos \textit{x} e \textit{y} são ajustados. O \textit{gradient descent} foi empregado para guiar a busca pelo deslocamento que maximiza a correlação.
+
+No entanto, a versão não linear tem uma vantagem significativa, ela pode atuar a nível de subpixel. A otimização a nível de subpixel oferece a vantagem de capturar deslocamentos e deformações com precisão superior à resolução nativa da imagem. Isso é essencial em aplicações onde pequenas variações têm impacto significativo, como em análises estruturais, biomecânicas ou ópticas. Métodos subpíxeis permitem detectar mudanças sutis que escapam aos métodos baseados em píxeis inteiros, melhorando a qualidade dos resultados e permitindo medições mais detalhadas e confiáveis. Essa precisão aprimorada é crucial para estudos avançados e tecnologias que exigem alta sensibilidade.
+
+\section{Desempenho}
+
+Durante os testes, observamos uma diferença significativa no tempo de execução entre os dois métodos. O algoritmo baseado em FFT foi consideravelmente mais rápido, confirmando sua viabilidade para aplicações em tempo real, como em mouses ópticos. Por outro lado, o método de \textit{gradient descent}, apesar de funcional, apresentou tempos de execução significativamente mais longos, tornando sua aplicação inviável para esse contexto.
+
+Além disso, quando o deslocamento era consideravelmente maior (do que nós usualmente esperaríamos para uma foto tirada logo após a outra em um mouse), o algoritmo PNL encontrava máximos locais
+muito distantes do valor correto, indicando - pelo menos em nossa implementação simples - pouca estabilidade.
+
+\begin{figure}%
+    \centering
+    \subfloat[\centering Figura original aleatória 64x64]{{\includegraphics[width=5cm]{original.png} }}%
+    \qquad
+    \subfloat[\centering Figura levemente deslocada, dx = 6, dy = 7]{{\includegraphics[width=5cm]{shifted.png} }}%
+    \caption{Exemplo de imagens que usamos para testar nossa aplicação}
+\end{figure}
+
+
+
+\section{Outras aplicações}
+No entanto, ao aprofundar nossa pesquisa, identificamos que algoritmos semelhantes ao \textit{gradient descent} são amplamente utilizados em outros domínios, como rastreamento de padrões em imagens médicas, análises de deformação e outras aplicações de correlação digital.
+
+
+A correlação digital de imagens (DIC) tem demonstrado aplicações relevantes nas seguintes indústrias:
+
+\begin{itemize}
+    \item Automotiva;
+    \item Aeroespacial;
+    \item Biológica;
+    \item Industrial;
+    \item Pesquisa e Educação;
+    \item Governamental e Militar;
+    \item Biomecânica;
+    \item Robótica;
+    \item Eletrônica.
+    \item Mapeamento de deformações causadas por Terremotos.
+\end{itemize}
+
+
+\section{Conclusão}
+
+Estudar a correlação digital de imagens foi uma experiência enriquecedora e revelou diversas aplicações práticas e teóricas dessa técnica em diferentes áreas. Apesar de o vídeo que inicialmente inspirou este trabalho ter sido um pouco presunçoso ao afirmar categoricamente como funcionava um mouse óptico, ele nos motivou a explorar uma área nova e fascinante. A pesquisa nos permitiu compreender melhor os fundamentos da DIC e a importância dos métodos de otimização, tanto lineares quanto não lineares, em diferentes contextos.
+
+Optamos por não incluir muitos cálculos detalhados neste relatório, pois os métodos matemáticos necessários para encontrar os resultados são consideravelmente avançados. No entanto, utilizando implementações disponíveis na internet — especialmente na documentação da biblioteca \texttt{SciPy} —, conseguimos realizar o projeto com sucesso. Essa abordagem prática nos permitiu focar na aplicação dos conceitos e nos resultados obtidos, enriquecendo nossa compreensão sobre a área. 
+
+O trabalho reforçou a relevância da otimização e da análise de imagens digitais, não apenas como ferramentas teóricas, mas também como soluções práticas com impacto em diversas indústrias e dispositivos do dia a dia.
+
+\section{Biblografia}
+\begin{itemize}
+    \item \url{https://en.wikipedia.org/wiki/Digital_image_correlation_and_tracking#cite_note-16}
+    \item \url{https://www.correlatedsolutions.com/}
+    \item \url{https://en.wikipedia.org/wiki/Optical_mouse}
+    \item \url{https://en.wikipedia.org/wiki/Optical_flow#cite_note-8}
+    \item \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.correlate.html}
+    \item \url{https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.correlate2d.html}
+    \item \url{https://en.wikipedia.org/wiki/Gradient_descent}
+    \item \url{https://en.wikipedia.org/wiki/Correlation}
+\end{itemize}
+
+\end{document}
